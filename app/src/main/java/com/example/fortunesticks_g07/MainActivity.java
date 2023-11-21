@@ -11,6 +11,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.ContextThemeWrapper;
 
 import java.util.Random;
 
@@ -22,7 +23,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     Boolean shown_dialog = false;
     private Handler hdr = new Handler();
     private static final int POLL_INTERVAL = 500;
-    Resources res = getResources();
+    public Resources res;
     private Runnable pollTask = new Runnable() {
         public void run() {
             showDialog();
@@ -41,7 +42,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         int type = sensorEvent.sensor.getType();
-
         if (type == Sensor.TYPE_ACCELEROMETER) {
             sensorInfo.accX = sensorEvent.values[0];
             sensorInfo.accY = sensorEvent.values[1];
@@ -58,13 +58,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if( ( Math.abs(sensorInfo.accX) > shake_threshold) || ( Math.abs(sensorInfo.accY) > shake_threshold ) || ( Math.abs(sensorInfo.accZ) > shake_threshold ) ) {
             if(!shown_dialog) {
                 shown_dialog = true;
+                res = getResources();
                 int max = 9;
                 int min = 0;
                 Random randomNumber = new Random();
                 int resultRandom = randomNumber.nextInt(max - min + 1) + min;
                 String[] arr = res.getStringArray(R.array.randomText);
-                final AlertDialog.Builder viewDialog = new AlertDialog.Builder(this);
-//                viewDialog.setIcon(android.R.drawable.btn_star_big_on);
+                final AlertDialog.Builder viewDialog = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AlertDialogCustom));
+                viewDialog.setIcon(android.R.drawable.btn_star_big_on);
                 viewDialog.setTitle("ผลการทำนาย");
                 if(resultRandom == 0){
                     viewDialog.setMessage(arr[0]);
@@ -87,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 } else {
                     viewDialog.setMessage(arr[9]);
                 }
-//
+
                 viewDialog.setPositiveButton("OK",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
